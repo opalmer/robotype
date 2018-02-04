@@ -22,6 +22,7 @@ var (
 	clipboard = flag.Bool(
 		"clipboard", false,
 		"If provided, read input from the clipboard instead of a file.")
+	keydelay = flag.Duration("key-delay", time.Millisecond * 90, "The time between each key press")
 )
 
 func main() {
@@ -34,6 +35,7 @@ func main() {
 			log.Fatal(err)
 		}
 		text = txt
+
 	} else {
 		if len(flag.Args()) != 1 {
 			fmt.Printf("usage: %s <filepath>\n", os.Args[0])
@@ -50,7 +52,7 @@ func main() {
 			log.Fatal(err)
 		}
 
-		text := string(contents)
+		text = string(contents)
 		if !*notrim {
 			text = strings.TrimSpace(text)
 		}
@@ -58,5 +60,9 @@ func main() {
 
 	fmt.Printf("Sleeping %v seconds...\n", delay.Seconds())
 	time.Sleep(*delay)
-	robotgo.TypeString(text)
+
+	for _, character := range text {
+		robotgo.TypeStr(string(character))
+		time.Sleep(*keydelay)
+	}
 }
